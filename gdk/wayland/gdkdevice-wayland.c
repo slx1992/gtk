@@ -2102,3 +2102,14 @@ gdk_wayland_device_set_selection (GdkDevice             *gdk_device,
   wl_data_device_set_selection (device->data_device, source,
                                 _gdk_wayland_display_get_serial (display_wayland));
 }
+
+GdkDragContext *
+gdk_wayland_device_get_drop_context (GdkDevice *gdk_device)
+{
+  GdkWaylandDeviceData *device;
+
+  g_return_if_fail (GDK_IS_WAYLAND_DEVICE (gdk_device));
+  device = GDK_WAYLAND_DEVICE (gdk_device)->device;
+
+  return device->drop_context;
+}
