@@ -592,8 +592,7 @@ data_device_data_offer (void                  *data,
             g_message ("data device data offer, data device %p, offer %p",
                        data_device, offer));
 
-  gdk_wayland_selection_set_offer (device->display, offer);
-  emit_selection_owner_change_forall (gdk_atom_intern_static_string ("GdkWaylandSelection"));
+  gdk_wayland_selection_ensure_offer (device->display, offer);
 }
 
 static void
@@ -607,6 +606,7 @@ data_device_enter (void                  *data,
 {
   GdkWaylandDeviceData *device = (GdkWaylandDeviceData *)data;
   GdkWindow *dest_window, *dnd_owner;
+  GdkAtom selection;
 
   dest_window = wl_surface_get_user_data (surface);
 
@@ -624,7 +624,8 @@ data_device_enter (void                  *data,
 
   gdk_wayland_drop_context_update_targets (device->drop_context);
 
-  dnd_owner = gdk_selection_owner_get_for_display (device->display, gdk_drag_get_selection (device->drop_context));
+  selection = gdk_drag_get_selection (device->drop_context);
+  dnd_owner = gdk_selection_owner_get_for_display (device->display, selection);
 
   if (!dnd_owner)
     dnd_owner = device->foreign_dnd_window;
@@ -638,9 +639,9 @@ data_device_enter (void                  *data,
                                         wl_fixed_to_double (y));
   _gdk_wayland_drag_context_emit_event (device->drop_context, GDK_DRAG_ENTER,
                                         GDK_CURRENT_TIME);
-  gdk_wayland_selection_set_offer (device->display, offer);
-  emit_selection_owner_change (dest_window,
-                               gdk_atom_intern_static_string ("GdkWaylandSelection"));
+
+  gdk_wayland_selection_set_offer (device->display, selection, offer);
+  emit_selection_owner_change_forall (selection);
 }
 
 static void
@@ -720,13 +721,15 @@ data_device_selection (void                  *data,
                        struct wl_data_offer  *offer)
 {
   GdkWaylandDeviceData *device = (GdkWaylandDeviceData *) data;
+  GdkAtom selection;
 
   GDK_NOTE (EVENTS,
             g_message ("data device selection, data device %p, data offer %p",
                        wl_data_device, offer));
 
-  gdk_wayland_selection_set_offer (device->display, offer);
-  emit_selection_owner_change_forall (gdk_atom_intern_static_string ("CLIPBOARD"));
+  selection = gdk_atom_intern_static_string ("CLIPBOARD");
+  gdk_wayland_selection_set_offer (device->display, selection, offer);
+  emit_selection_owner_change_forall (selection);
 }
 
 static const struct wl_data_device_listener data_device_listener = {
