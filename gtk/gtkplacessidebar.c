@@ -1207,17 +1207,6 @@ update_places (GtkPlacesSidebar *sidebar)
     }
   g_list_free (volumes);
 
-  /* file system root */
-
-  mount_uri = "file:///"; /* No need to strdup */
-  icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_FILESYSTEM);
-  add_place (sidebar, PLACES_BUILT_IN,
-             SECTION_DEVICES,
-             sidebar->hostname, icon, mount_uri,
-             NULL, NULL, NULL, 0,
-             _("Open the contents of the file system"));
-  g_object_unref (icon);
-
   /* add mounts that has no volume (/etc/mtab mounts, ftp, sftp,...) */
   mounts = g_volume_monitor_get_mounts (volume_monitor);
 
@@ -1305,28 +1294,6 @@ update_places (GtkPlacesSidebar *sidebar)
   /* network */
   if (!sidebar->local_only)
     {
-      add_heading (sidebar, SECTION_NETWORK, _("Network"));
-
-      mount_uri = "network:///";
-      icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_NETWORK);
-      add_place (sidebar, PLACES_BUILT_IN,
-                 SECTION_NETWORK,
-                 _("Browse Network"), icon, mount_uri,
-                 NULL, NULL, NULL, 0,
-                 _("Browse the contents of the network"));
-      g_object_unref (icon);
-
-      if (sidebar->show_connect_to_server)
-        {
-          icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_NETWORK_SERVER);
-          add_place (sidebar, PLACES_CONNECT_TO_SERVER,
-                     SECTION_NETWORK,
-                     _("Connect to Server"), icon, NULL,
-                     NULL, NULL, NULL, 0,
-                     _("Connect to a network server address"));
-          g_object_unref (icon);
-        }
-
       network_volumes = g_list_reverse (network_volumes);
       for (l = network_volumes; l != NULL; l = l->next)
         {
