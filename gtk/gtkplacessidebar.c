@@ -4627,7 +4627,8 @@ gtk_places_sidebar_class_init (GtkPlacesSidebarClass *class)
    * a URL like "sftp://ftp.example.com".  It is up to the application to create
    * the corresponding mount by using, for example, g_file_mount_enclosing_volume().
    *
-   * Since: 3.10
+   * Deprecated: 3.18: use #GtkPlacesSidebar::show-other-locations property to
+   * connect to network servers.
    */
   places_sidebar_signals [SHOW_CONNECT_TO_SERVER] =
           g_signal_new (I_("show-connect-to-server"),
@@ -4790,7 +4791,7 @@ gtk_places_sidebar_class_init (GtkPlacesSidebarClass *class)
                                 P_("Show 'Connect to Server'"),
                                 P_("Whether the sidebar includes a builtin shortcut to a 'Connect to server' dialog"),
                                 FALSE,
-                                G_PARAM_READWRITE);
+                                G_PARAM_READWRITE | G_PARAM_DEPRECATED);
   properties[PROP_SHOW_ENTER_LOCATION] =
           g_param_spec_boolean ("show-enter-location",
                                 P_("Show 'Enter Location'"),
@@ -5135,7 +5136,7 @@ gtk_places_sidebar_get_show_desktop (GtkPlacesSidebar *sidebar)
  * An application may want to turn this on if it implements a way for the user to connect
  * to network servers directly.
  *
- * Since: 3.10
+ * Deprecated: 3.18: use gtk_places_sidebar_set_show_other_locations() instead.
  */
 void
 gtk_places_sidebar_set_show_connect_to_server (GtkPlacesSidebar *sidebar,
@@ -5160,7 +5161,7 @@ gtk_places_sidebar_set_show_connect_to_server (GtkPlacesSidebar *sidebar,
  *
  * Returns: %TRUE if the sidebar will display a “Connect to Server” item.
  *
- * Since: 3.10
+ * Deprecated: 3.18: use gtk_places_sidebar_get_show_other_locations() instead.
  */
 gboolean
 gtk_places_sidebar_get_show_connect_to_server (GtkPlacesSidebar *sidebar)
