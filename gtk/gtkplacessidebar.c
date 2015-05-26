@@ -243,10 +243,9 @@ typedef enum {
 } PlaceType;
 
 typedef enum {
-  SECTION_DEVICES,
   SECTION_BOOKMARKS,
   SECTION_COMPUTER,
-  SECTION_NETWORK,
+  SECTION_MOUNTS,
   SECTION_OTHER_LOCATIONS
 } SectionType;
 
@@ -473,10 +472,10 @@ check_heading_for_section (GtkPlacesSidebar *sidebar,
 {
   switch (section_type)
     {
-    case SECTION_DEVICES:
+    case SECTION_MOUNTS:
       if (!sidebar->devices_header_added)
         {
-          add_heading (sidebar, SECTION_DEVICES, _("Devices"));
+          add_heading (sidebar, SECTION_MOUNTS, _("Mount Points"));
           sidebar->devices_header_added = TRUE;
         }
       break;
@@ -1084,7 +1083,7 @@ update_places (GtkPlacesSidebar *sidebar)
                   tooltip = g_file_get_parse_name (root);
 
                   add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                             SECTION_DEVICES,
+                             SECTION_MOUNTS,
                              name, icon, mount_uri,
                              drive, volume, mount, 0, tooltip);
                   g_object_unref (root);
@@ -1109,7 +1108,7 @@ update_places (GtkPlacesSidebar *sidebar)
                   tooltip = g_strdup_printf (_("Mount and open “%s”"), name);
 
                   add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                             SECTION_DEVICES,
+                             SECTION_MOUNTS,
                              name, icon, NULL,
                              drive, volume, NULL, 0, tooltip);
                   g_object_unref (icon);
@@ -1137,7 +1136,7 @@ update_places (GtkPlacesSidebar *sidebar)
               tooltip = g_strdup_printf (_("Mount and open “%s”"), name);
 
               add_place (sidebar, PLACES_BUILT_IN,
-                         SECTION_DEVICES,
+                         SECTION_MOUNTS,
                          name, icon, NULL,
                          drive, NULL, NULL, 0, tooltip);
               g_object_unref (icon);
@@ -1181,7 +1180,7 @@ update_places (GtkPlacesSidebar *sidebar)
           tooltip = g_file_get_parse_name (root);
           name = g_mount_get_name (mount);
           add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                     SECTION_DEVICES,
+                     SECTION_MOUNTS,
                      name, icon, mount_uri,
                      NULL, volume, mount, 0, tooltip);
           g_object_unref (mount);
@@ -1197,7 +1196,7 @@ update_places (GtkPlacesSidebar *sidebar)
           icon = g_volume_get_symbolic_icon (volume);
           name = g_volume_get_name (volume);
           add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                     SECTION_DEVICES,
+                     SECTION_MOUNTS,
                      name, icon, NULL,
                      NULL, volume, NULL, 0, name);
           g_object_unref (icon);
@@ -1312,7 +1311,7 @@ update_places (GtkPlacesSidebar *sidebar)
               tooltip = g_strdup_printf (_("Mount and open “%s”"), name);
 
               add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                         SECTION_NETWORK,
+                         SECTION_MOUNTS,
                          name, icon, NULL,
                          NULL, volume, NULL, 0, tooltip);
               g_object_unref (icon);
@@ -1331,7 +1330,7 @@ update_places (GtkPlacesSidebar *sidebar)
           name = g_mount_get_name (mount);
           tooltip = g_file_get_parse_name (root);
           add_place (sidebar, PLACES_MOUNTED_VOLUME,
-                     SECTION_NETWORK,
+                     SECTION_MOUNTS,
                      name, icon, mount_uri,
                      NULL, NULL, mount, 0, tooltip);
           g_object_unref (root);
