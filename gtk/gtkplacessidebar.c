@@ -5420,6 +5420,18 @@ gtk_places_sidebar_get_nth_bookmark (GtkPlacesSidebar *sidebar,
   return file;
 }
 
+/**
+ * gtk_places_sidebar_set_show_other_locations:
+ * @sidebar: a places sidebar
+ * @show_other_locations: whether to show an item for the Other Locations view
+ *
+ * Sets whether the @sidebar should show an item for the application to show an Other Locations
+ * view; this is off by default.
+ * An application may want to turn this on if it implements a way for the user to see and interact
+ * to drives and network servers directly.
+ *
+ * Since: 3.18
+ */
 void
 gtk_places_sidebar_set_show_other_locations (GtkPlacesSidebar *sidebar,
                                              gboolean          show_other_locations)
@@ -5435,6 +5447,16 @@ gtk_places_sidebar_set_show_other_locations (GtkPlacesSidebar *sidebar,
     }
 }
 
+/**
+ * gtk_places_sidebar_get_show_other_locations:
+ * @sidebar: a places sidebar
+ *
+ * Returns the value previously set with gtk_places_sidebar_set_show_other_locations()
+ *
+ * Returns: %TRUE if the sidebar will display an “Other Locations” item.
+ *
+ * Since: 3.18
+ */
 gboolean
 gtk_places_sidebar_get_show_other_locations (GtkPlacesSidebar *sidebar)
 {
