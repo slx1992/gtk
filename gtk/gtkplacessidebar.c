@@ -1070,6 +1070,9 @@ update_places (GtkPlacesSidebar *sidebar)
                 }
               g_free (identifier);
 
+              if (!g_drive_is_media_removable (drive))
+                continue;
+
               mount = g_volume_get_mount (volume);
               if (mount != NULL)
                 {
