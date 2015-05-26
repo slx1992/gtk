@@ -1191,9 +1191,9 @@ gtk_drag_highlight (GtkWidget  *widget)
 {
   g_return_if_fail (GTK_IS_WIDGET (widget));
 
-  g_signal_connect_after (widget, "draw",
-                          G_CALLBACK (gtk_drag_highlight_draw),
-                          NULL);
+  g_signal_connect (widget, "draw",
+                    G_CALLBACK (gtk_drag_highlight_draw),
+                    NULL);
 
   gtk_widget_queue_draw (widget);
 }
