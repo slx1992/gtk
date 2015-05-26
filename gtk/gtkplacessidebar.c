@@ -1339,6 +1339,17 @@ update_places (GtkPlacesSidebar *sidebar)
           g_free (mount_uri);
           g_free (tooltip);
         }
+
+      if (sidebar->show_connect_to_server)
+        {
+          icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_NETWORK_SERVER);
+          add_place (sidebar, PLACES_CONNECT_TO_SERVER,
+                     SECTION_MOUNTS,
+                     _("Connect to Server"), icon, NULL,
+                     NULL, NULL, NULL, 0,
+                     _("Connect to a network server address"));
+          g_object_unref (icon);
+        }
     }
 
   g_list_free_full (network_volumes, g_object_unref);
@@ -3978,14 +3989,6 @@ places_sidebar_sort_func (GtkTreeModel *model,
       retval = 1;
     }
   else if (section_type_b == SECTION_OTHER_LOCATIONS)
-    {
-      retval = -1;
-    }
-  else if (place_type_a == PLACES_CONNECT_TO_SERVER)
-    {
-      retval = 1;
-    }
-  else if (place_type_b == PLACES_CONNECT_TO_SERVER)
     {
       retval = -1;
     }
