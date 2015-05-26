@@ -132,6 +132,12 @@ GDK_AVAILABLE_IN_3_10
 GFile *            gtk_places_sidebar_get_nth_bookmark           (GtkPlacesSidebar   *sidebar,
                                                                   gint                n);
 
+GDK_AVAILABLE_IN_3_18
+void                 gtk_places_sidebar_set_show_other_locations (GtkPlacesSidebar   *sidebar,
+                                                                  gboolean            show_other_locations);
+GDK_AVAILABLE_IN_3_18
+gboolean             gtk_places_sidebar_get_show_other_locations (GtkPlacesSidebar   *sidebar);
+
 G_END_DECLS
 
 #endif /* __GTK_PLACES_SIDEBAR_H__ */

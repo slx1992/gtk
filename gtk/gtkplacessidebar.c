@@ -178,6 +178,7 @@ struct _GtkPlacesSidebar {
   guint show_desktop_set       : 1;
   guint show_desktop           : 1;
   guint show_connect_to_server : 1;
+  guint show_other_locations   : 1;
   guint show_enter_location    : 1;
   guint local_only             : 1;
 };
@@ -207,6 +208,8 @@ struct _GtkPlacesSidebarClass {
                                       GList              *source_file_list,
                                       GdkDragAction       action);
   void    (* show_enter_location)    (GtkPlacesSidebar   *sidebar);
+
+  void    (* show_other_locations)   (GtkPlacesSidebar   *sidebar);
 };
 
 enum {
@@ -235,14 +238,16 @@ typedef enum {
   PLACES_HEADING,
   PLACES_CONNECT_TO_SERVER,
   PLACES_ENTER_LOCATION,
-  PLACES_DROP_FEEDBACK
+  PLACES_DROP_FEEDBACK,
+  PLACES_OTHER_LOCATIONS
 } PlaceType;
 
 typedef enum {
   SECTION_DEVICES,
   SECTION_BOOKMARKS,
   SECTION_COMPUTER,
-  SECTION_NETWORK
+  SECTION_NETWORK,
+  SECTION_OTHER_LOCATIONS
 } SectionType;
 
 enum {
@@ -254,6 +259,7 @@ enum {
   DRAG_ACTION_REQUESTED,
   DRAG_ACTION_ASK,
   DRAG_PERFORM_DROP,
+  SHOW_OTHER_LOCATIONS,
   LAST_SIGNAL
 };
 
@@ -264,6 +270,7 @@ enum {
   PROP_SHOW_CONNECT_TO_SERVER,
   PROP_SHOW_ENTER_LOCATION,
   PROP_LOCAL_ONLY,
+  PROP_SHOW_OTHER_LOCATIONS,
   NUM_PROPERTIES
 };
 
@@ -275,6 +282,7 @@ enum {
 #define ICON_NAME_NETWORK  "network-workgroup-symbolic"
 #define ICON_NAME_NETWORK_SERVER "network-server-symbolic"
 #define ICON_NAME_FOLDER_NETWORK "folder-remote-symbolic"
+#define ICON_NAME_OTHER_LOCATIONS "list-add-symbolic"
 
 #define ICON_NAME_FOLDER                "folder-symbolic"
 #define ICON_NAME_FOLDER_DESKTOP  "user-desktop-symbolic"
@@ -385,6 +393,12 @@ static void
 emit_show_enter_location (GtkPlacesSidebar *sidebar)
 {
   g_signal_emit (sidebar, places_sidebar_signals[SHOW_ENTER_LOCATION], 0);
+}
+
+static void
+emit_show_other_locations (GtkPlacesSidebar *sidebar)
+{
+  g_signal_emit (sidebar, places_sidebar_signals[SHOW_OTHER_LOCATIONS], 0);
 }
 
 static GdkDragAction
@@ -1360,6 +1374,21 @@ update_places (GtkPlacesSidebar *sidebar)
 
   g_list_free_full (network_volumes, g_object_unref);
   g_list_free_full (network_mounts, g_object_unref);
+
+  /* Other locations */
+  if (sidebar->show_other_locations)
+    {
+      add_heading (sidebar, SECTION_OTHER_LOCATIONS, _("Other Locations"));
+
+      icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_OTHER_LOCATIONS);
+
+      add_place (sidebar, PLACES_OTHER_LOCATIONS,
+                 SECTION_OTHER_LOCATIONS,
+                 _("Other Locations"), icon, NULL,
+                 NULL, NULL, NULL, 0, _("Show other locations"));
+
+      g_object_unref (icon);
+    }
 
   /* restore original selection */
   if (original_uri)
@@ -2486,6 +2515,10 @@ open_selected_bookmark (GtkPlacesSidebar   *sidebar,
   else if (place_type == PLACES_ENTER_LOCATION)
     {
       emit_show_enter_location (sidebar);
+    }
+  else if (place_type == PLACES_OTHER_LOCATIONS)
+    {
+      emit_show_other_locations (sidebar);
     }
   else
     {
@@ -3963,6 +3996,22 @@ places_sidebar_sort_func (GtkTreeModel *model,
 
       retval = pos_a - pos_b;
     }
+  else if (place_type_a == PLACES_OTHER_LOCATIONS)
+    {
+      retval = 1;
+    }
+  else if (place_type_b == PLACES_OTHER_LOCATIONS)
+    {
+      retval = -1;
+    }
+  else if (section_type_a == SECTION_OTHER_LOCATIONS)
+    {
+      retval = 1;
+    }
+  else if (section_type_b == SECTION_OTHER_LOCATIONS)
+    {
+      retval = -1;
+    }
   else if (place_type_a == PLACES_CONNECT_TO_SERVER)
     {
       retval = 1;
@@ -4336,6 +4385,10 @@ gtk_places_sidebar_set_property (GObject      *obj,
       gtk_places_sidebar_set_local_only (sidebar, g_value_get_boolean (value));
       break;
 
+    case PROP_SHOW_OTHER_LOCATIONS:
+      gtk_places_sidebar_set_show_other_locations (sidebar, g_value_get_boolean (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (obj, property_id, pspec);
       break;
@@ -4374,6 +4427,10 @@ gtk_places_sidebar_get_property (GObject    *obj,
 
     case PROP_LOCAL_ONLY:
       g_value_set_boolean (value, gtk_places_sidebar_get_local_only (sidebar));
+      break;
+
+    case PROP_SHOW_OTHER_LOCATIONS:
+      g_value_set_boolean (value, gtk_places_sidebar_get_show_other_locations (sidebar));
       break;
 
     default:
@@ -4688,6 +4745,27 @@ gtk_places_sidebar_class_init (GtkPlacesSidebarClass *class)
                         G_TYPE_POINTER, /* GList of GFile */
                         G_TYPE_INT);
 
+  /**
+   * GtkPlacesSidebar::show-other-locations:
+   * @sidebar: the object which received the signal.
+   *
+   * The places sidebar emits this signal when it needs the calling
+   * application to present an way to show other locations e.g. drives
+   * and network access points.
+   * For example, the application may bring up a page showing the volumes
+   * and discovered network addresses.
+   *
+   * Since: 3.18
+   */
+  places_sidebar_signals [SHOW_OTHER_LOCATIONS] =
+          g_signal_new (I_("show-other-locations"),
+                        G_OBJECT_CLASS_TYPE (gobject_class),
+                        G_SIGNAL_RUN_FIRST,
+                        G_STRUCT_OFFSET (GtkPlacesSidebarClass, show_other_locations),
+                        NULL, NULL,
+                        _gtk_marshal_VOID__VOID,
+                        G_TYPE_NONE, 0);
+
   properties[PROP_LOCATION] =
           g_param_spec_object ("location",
                                P_("Location to Select"),
@@ -4723,6 +4801,12 @@ gtk_places_sidebar_class_init (GtkPlacesSidebarClass *class)
           g_param_spec_boolean ("local-only",
                                 P_("Local Only"),
                                 P_("Whether the sidebar only includes local files"),
+                                FALSE,
+                                G_PARAM_READWRITE);
+  properties[PROP_SHOW_OTHER_LOCATIONS] =
+          g_param_spec_boolean ("show-other-locations",
+                                P_("Show 'Other locations'"),
+                                P_("Whether the sidebar includes an item to show customly external locations"),
                                 FALSE,
                                 G_PARAM_READWRITE);
 
@@ -5334,4 +5418,27 @@ gtk_places_sidebar_get_nth_bookmark (GtkPlacesSidebar *sidebar,
     }
 
   return file;
+}
+
+void
+gtk_places_sidebar_set_show_other_locations (GtkPlacesSidebar *sidebar,
+                                             gboolean          show_other_locations)
+{
+  g_return_if_fail (GTK_IS_PLACES_SIDEBAR (sidebar));
+
+  show_other_locations = !!show_other_locations;
+  if (sidebar->show_other_locations != show_other_locations)
+    {
+      sidebar->show_other_locations = show_other_locations;
+      update_places (sidebar);
+      g_object_notify_by_pspec (G_OBJECT (sidebar), properties[PROP_SHOW_OTHER_LOCATIONS]);
+    }
+}
+
+gboolean
+gtk_places_sidebar_get_show_other_locations (GtkPlacesSidebar *sidebar)
+{
+  g_return_val_if_fail (GTK_IS_PLACES_SIDEBAR (sidebar), FALSE);
+
+  return sidebar->show_other_locations;
 }
