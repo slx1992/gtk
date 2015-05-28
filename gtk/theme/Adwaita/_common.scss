@@ -2886,6 +2886,10 @@ GtkPlacesSidebar.sidebar {
 
   SidebarRow { padding: 2px 8px; }
 
+  .dnd {
+    box-shadow: inset 0px 0px 0px 1px mix($fg_color, $selected_bg_color, 50%);
+  }
+
   .sidebar-icon {
     padding-left: 8px;
     padding-right: 8px;

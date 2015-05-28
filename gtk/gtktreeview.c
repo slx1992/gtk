@@ -5573,6 +5573,10 @@ gtk_tree_view_draw (GtkWidget *widget,
   GtkStyleContext *context;
 
   context = gtk_widget_get_style_context (widget);
+  /* Style to the GtkTreeWidget are applied to every cell as well, so when dragging,
+   * if we apply a border to highligth the drop target it actually draw a border
+   * on every cell. For that, just remove the class here... */
+  gtk_style_context_remove_class (context, "dnd");
 
   if (gtk_cairo_should_draw_window (cr, tree_view->priv->bin_window))
     {
