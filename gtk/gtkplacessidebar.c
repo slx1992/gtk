@@ -1800,6 +1800,52 @@ update_places (GtkPlacesSidebar *sidebar)
     }
 }
 
+static gboolean
+check_valid_drop_target (GtkPlacesSidebar *sidebar,
+                         SidebarRow       *row)
+{
+  PlaceType place_type;
+  SectionType section_type;
+  gboolean valid = FALSE;
+
+  if (row == NULL)
+    return FALSE;
+
+  g_object_get (row,
+                "place-type", &place_type,
+                "section_type", &section_type,
+                NULL);
+
+  if (place_type == PLACES_CONNECT_TO_SERVER)
+    return FALSE;
+
+  /* Dragging a bookmark? */
+  if (sidebar->drag_data_received &&
+      sidebar->drag_data_info == DND_SIDEBAR_ROW)
+    {
+      /* Don't allow reordering bookmarks into non-bookmark areas */
+      valid = section_type == SECTION_BOOKMARKS;
+    }
+  else
+    {
+      /* Dragging a file */
+        valid = TRUE;
+    }
+
+  /* Disallow drops on recent:/// */
+  if (place_type == PLACES_BUILT_IN)
+    {
+      gchar *uri;
+
+      g_object_get (row, "uri", &uri, NULL);
+
+      if (g_strcmp0 (uri, "recent:///") == 0)
+        valid = FALSE;
+    }
+
+  return valid;
+}
+
 static void
 update_possible_drop_targets (GtkPlacesSidebar *sidebar,
                               gboolean          dragging)
@@ -1819,85 +1865,13 @@ update_possible_drop_targets (GtkPlacesSidebar *sidebar,
 
       if (dragging)
         {
-          if (sidebar->drag_data_info == DND_TEXT_URI_LIST ||
-              sidebar->drop_state == DROP_STATE_NEW_BOOKMARK_ARMED_PERMANENT)
-            {
-              switch (place_type)
-                {
-                  case PLACES_CONNECT_TO_SERVER:
-                    sensitive = FALSE;
-                    break;
-                  case PLACES_BUILT_IN:
-                    if (g_strcmp0 (uri, "recent:///") == 0)
-                      sensitive = FALSE;
-
-                    break;
-                  default:
-                    break;
-                }
-            }
-          else
-            {
-              sensitive = place_type == PLACES_BOOKMARK;
-            }
+          sensitive = check_valid_drop_target (sidebar, SIDEBAR_ROW (l->data));
         }
 
       g_object_set (SIDEBAR_ROW (l->data), "sensitive", sensitive, NULL);
     }
 
   g_list_free (rows);
-}
-
-static gboolean
-check_valid_drop_target (GtkPlacesSidebar *sidebar,
-                         gint              y)
-{
-  GtkListBoxRow *row;
-  PlaceType place_type;
-  SectionType section_type;
-  gboolean valid = FALSE;
-
-  row = gtk_list_box_get_row_at_y (GTK_LIST_BOX (sidebar->list_box), y);
-  if (row == NULL)
-    return valid;
-
-  g_object_get (row,
-                "place-type", &place_type,
-                "section_type", &section_type,
-                NULL);
-
-  if (place_type == PLACES_DROP_FEEDBACK)
-    {
-      valid = TRUE;
-      goto out;
-    }
-
-  /* Dragging a bookmark? */
-  if (sidebar->drag_data_received &&
-      sidebar->drag_data_info == DND_SIDEBAR_ROW)
-    {
-      /* Don't allow reordering bookmarks into non-bookmark areas */
-      valid = section_type == SECTION_BOOKMARKS;
-    }
-  else
-    {
-      /* Dragging a file */
-      valid = TRUE;
-    }
-
-  /* Disallow drops on recent:/// */
-  if (place_type == PLACES_BUILT_IN)
-    {
-      gchar *uri;
-
-      g_object_get (row, "uri", &uri, NULL);
-
-      if (g_strcmp0 (uri, "recent:///") == 0)
-        valid = FALSE;
-    }
-
-out:
-  return valid;
 }
 
 static gboolean
@@ -1945,7 +1919,7 @@ start_drop_feedback (GtkPlacesSidebar *sidebar,
         sidebar->drop_state = DROP_STATE_NEW_BOOKMARK_ARMED;
     }
 
-  if (row != NULL)
+  if (check_valid_drop_target (sidebar, row))
     gtk_list_box_drag_highlight_row (GTK_LIST_BOX (sidebar->list_box), GTK_LIST_BOX_ROW (row));
 
   update_possible_drop_targets (sidebar, TRUE);
@@ -2095,7 +2069,7 @@ drag_motion_callback (GtkWidget      *widget,
         }
     }
 
-  valid_drop_target = check_valid_drop_target (sidebar, y);
+  valid_drop_target = check_valid_drop_target (sidebar, SIDEBAR_ROW (row));
   if (!valid_drop_target)
     {
       g_print ("drop position invalid\n");
@@ -2360,7 +2334,7 @@ drag_data_received_callback (GtkWidget        *list_box,
 
   success = FALSE;
 
-  valid_drop_target = check_valid_drop_target (sidebar, y);
+  valid_drop_target = check_valid_drop_target (sidebar, SIDEBAR_ROW (target_row));
   if (!valid_drop_target)
     goto out;
 
