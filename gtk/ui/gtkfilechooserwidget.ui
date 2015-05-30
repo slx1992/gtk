@@ -19,12 +19,14 @@
                 <property name="hscrollbar_policy">never</property>
                 <property name="local_only">True</property>
                 <property name="show_enter_location">True</property>
+                <property name="show_other_locations">True</property>
                 <style>
                   <class name="sidebar"/>
                 </style>
                 <signal name="open-location" handler="places_sidebar_open_location_cb" swapped="no"/>
                 <signal name="show-error-message" handler="places_sidebar_show_error_message_cb" swapped="no"/>
                 <signal name="show-enter-location" handler="places_sidebar_show_enter_location_cb" swapped="no"/>
+                <signal name="show-other-locations" handler="places_sidebar_show_other_locations_cb" swapped="no"/>
               </object>
               <packing>
                 <property name="resize">False</property>
@@ -237,6 +239,71 @@
                           </object>
                           <packing>
                             <property name="name">list</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="other_files_swin">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">never</property>
+                            <child>
+                              <object class="GtkTreeView" id="other_files_list_box">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="enable-search">False</property>
+                                <property name="headers-visible">False</property>
+                                <child internal-child="accessible">
+                                  <object class="AtkObject" id="other_files_tree_view-atkobject">
+                                    <property name="AtkObject::accessible-name" translatable="yes">Files</property>
+                                  </object>
+                                </child>
+                                <signal name="button-press-event" handler="list_button_press_event_cb" swapped="no"/>
+                                <signal name="drag-data-received" handler="file_list_drag_data_received_cb" swapped="no"/>
+                                <signal name="drag-drop" handler="file_list_drag_drop_cb" swapped="no"/>
+                                <signal name="drag-motion" handler="file_list_drag_motion_cb" swapped="no"/>
+                                <signal name="key-press-event" handler="browse_files_key_press_event_cb" swapped="no"/>
+                                <signal name="popup-menu" handler="list_popup_menu_cb" swapped="no"/>
+                                <signal name="query-tooltip" handler="file_list_query_tooltip_cb" swapped="no"/>
+                                <signal name="row-activated" handler="list_row_activated" swapped="no"/>
+                                <signal name="cursor-changed" handler="list_cursor_changed" swapped="no"/>
+                                <child internal-child="selection">
+                                  <object class="GtkTreeSelection" id="treeview-selection3">
+                                    <!--<signal name="changed" handler="list_selection_changed" swapped="no"/>-->
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="other_locations_list_name_column">
+                                    <property name="resizable">True</property>
+                                    <property name="title" translatable="yes">Name</property>
+                                    <property name="expand">True</property>
+                                    <child>
+                                      <object class="GtkCellRendererPixbuf" id="other_locations_list_pixbuf_renderer">
+                                        <property name="xpad">6</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCellRendererText" id="other_locations_list_name_renderer">
+                                        <property name="ellipsize">middle</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="other_locations_list_location_column">
+                                    <property name="resizable">True</property>
+                                    <property name="visible">False</property>
+                                    <property name="title" translatable="yes">Location</property>
+                                    <child>
+                                      <object class="GtkCellRendererText" id="other_locations_list_location_renderer"/>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">other_locations</property>
                           </packing>
                         </child>
                         <child>

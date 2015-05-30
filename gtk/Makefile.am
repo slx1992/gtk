@@ -236,6 +236,7 @@ gtk_public_h_sources = 		\
 	gtkpaned.h		\
 	gtkpapersize.h		\
 	gtkplacessidebar.h	\
+	gtkplacesview.h		\
 	gtkplug.h		\
 	gtkpopover.h		\
 	gtkpopovermenu.h	\
@@ -752,6 +753,7 @@ gtk_base_c_sources = 		\
 	gtkpapersize.c		\
 	gtkpathbar.c		\
 	gtkplacessidebar.c	\
+	gtkplacesview.c		\
 	gtkprintcontext.c	\
 	gtkprintoperation.c	\
 	gtkprintoperationpreview.c \
@@ -1081,12 +1083,14 @@ templates =				\
 	ui/gtkmessagedialog.ui	\
 	ui/gtkpagesetupunixdialog.ui	\
 	ui/gtkpathbar.ui		\
+	ui/gtkplacesview.ui		\
 	ui/gtkprintunixdialog.ui	\
 	ui/gtkrecentchooserdefault.ui	\
 	ui/gtksearchbar.ui		\
 	ui/gtkscalebutton.ui		\
 	ui/gtkstatusbar.ui		\
-	ui/gtkvolumebutton.ui
+	ui/gtkvolumebutton.ui		\
+	ui/placesrow.ui
 
 #
 # rules to generate built sources
