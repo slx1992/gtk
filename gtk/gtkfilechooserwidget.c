@@ -2230,6 +2230,7 @@ places_sidebar_show_other_locations_cb (GtkPlacesSidebar     *sidebar,
   gtk_stack_set_visible_child_name (GTK_STACK (priv->browse_files_stack), "other_locations");
 
   priv->preview_widget_active = FALSE;
+  gtk_widget_hide (GTK_WIDGET (priv->browse_header_box));
   update_preview_widget_visibility (impl);
 }
 
