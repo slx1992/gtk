@@ -63,6 +63,8 @@ gtk_places_view_finalize (GObject *object)
   GtkPlacesView *self = (GtkPlacesView *)object;
   GtkPlacesViewPrivate *priv = gtk_places_view_get_instance_private (self);
 
+  g_clear_object (&priv->volume_monitor);
+
   G_OBJECT_CLASS (gtk_places_view_parent_class)->finalize (object);
 }
 
@@ -124,6 +126,13 @@ gtk_places_view_class_init (GtkPlacesViewClass *klass)
 static void
 gtk_places_view_init (GtkPlacesView *self)
 {
+  GtkPlacesViewPrivate *priv;
+
+  priv = gtk_places_view_get_instance_private (self);
+  self->priv = priv;
+
+  priv->volume_monitor = g_volume_monitor_get ();
+
   gtk_widget_init_template (GTK_WIDGET (self));
 }
 
