@@ -87,8 +87,8 @@
                         <property name="can_focus">False</property>
                         <property name="margin_start">12</property>
                         <property name="margin_end">12</property>
-                        <property name="margin_top">12</property>
-                        <property name="margin_bottom">12</property>
+                        <property name="margin_top">6</property>
+                        <property name="margin_bottom">6</property>
                         <property name="label" translatable="yes">&lt;b&gt;This Computer&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="xalign">0</property>
@@ -139,8 +139,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="margin_start">12</property>
-                        <property name="margin_top">12</property>
-                        <property name="margin_bottom">12</property>
+                        <property name="margin_top">6</property>
+                        <property name="margin_bottom">6</property>
                         <property name="hexpand">False</property>
                         <property name="label" translatable="yes">&lt;b&gt;Network&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
