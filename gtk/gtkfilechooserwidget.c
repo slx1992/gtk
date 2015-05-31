@@ -236,8 +236,6 @@ struct _GtkFileChooserWidgetPrivate {
   GtkWidget *new_folder_error_label;
   GtkWidget *new_folder_popover;
 
-  GtkListStore *other_locations_store;
-
   GtkFileSystemModel *browse_files_model;
   char *browse_files_last_selected_name;
 
