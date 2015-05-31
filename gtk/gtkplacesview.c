@@ -147,9 +147,15 @@ gtk_places_view_new (void)
 }
 
 /**
- * gtkplacesview_func:
+ * gtk_places_view_get_local_only:
+ * @view: a #GtkPlacesView
  *
- * %TRUE if only local volumes are shown, %FALSE otherwise.
+ * Returns %TRUE if only local volumes are shown, i.e. no networks
+ * are displayed.
+ *
+ * Returns: %TRUE if only local volumes are shown, %FALSE otherwise.
+ *
+ * Since: 3.18
  */
 gboolean
 gtk_places_view_get_local_only (GtkPlacesView *view)
@@ -164,6 +170,17 @@ gtk_places_view_get_local_only (GtkPlacesView *view)
   return class->get_local_only (view);
 }
 
+/**
+ * gtk_places_view_set_local_only:
+ * @view: a #GtkPlacesView
+ * @local_only: %TRUE to hide remote locations, %FALSE to show.
+ *
+ * Sets the #GtkPlacesView::local-only property to @local_only.
+ *
+ * Returns:
+ *
+ * Since: 3.18
+ */
 void
 gtk_places_view_set_local_only (GtkPlacesView *view,
                                 gboolean       local_only)
