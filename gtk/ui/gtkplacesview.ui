@@ -75,7 +75,6 @@
                 <property name="can_focus">False</property>
                 <property name="hexpand">True</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">12</property>
                 <child>
                   <object class="GtkBox" id="drives_box">
                     <property name="visible">True</property>
@@ -114,6 +113,7 @@
                       <object class="GtkListBox" id="drives_listbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="selection_mode">none</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
