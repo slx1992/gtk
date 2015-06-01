@@ -1104,9 +1104,8 @@ update_places (GtkPlacesSidebar *sidebar)
                   g_free (name);
                   g_free (tooltip);
                 }
-              g_object_unref (volume);
             }
-          g_list_free (volumes);
+          g_list_free_full (volumes, g_object_unref);
         }
       else
         {
@@ -1133,9 +1132,8 @@ update_places (GtkPlacesSidebar *sidebar)
               g_free (name);
             }
         }
-      g_object_unref (drive);
     }
-  g_list_free (drives);
+  g_list_free_full (drives, g_object_unref);
 
   /* add all volumes that is not associated with a drive */
   volumes = g_volume_monitor_get_volumes (volume_monitor);
