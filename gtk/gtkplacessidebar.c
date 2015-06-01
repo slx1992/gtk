@@ -1042,6 +1042,9 @@ update_places (GtkPlacesSidebar *sidebar)
     {
       drive = l->data;
 
+      if (!g_drive_is_media_removable (drive))
+        continue;
+
       volumes = g_drive_get_volumes (drive);
       if (volumes != NULL)
         {
@@ -1057,9 +1060,6 @@ update_places (GtkPlacesSidebar *sidebar)
                   continue;
                 }
               g_free (identifier);
-
-              if (!g_drive_is_media_removable (drive))
-                continue;
 
               mount = g_volume_get_mount (volume);
               if (mount != NULL)
