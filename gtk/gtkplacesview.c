@@ -242,58 +242,91 @@ gtk_places_view_set_property (GObject      *object,
 }
 
 static void
+add_volume (GtkPlacesView *view,
+            GVolume       *volume)
+{
+  GtkPlacesViewPrivate *priv;
+  GtkWidget *row;
+  GMount *mount;
+  GFile *root;
+  GIcon *icon;
+  gchar *name;
+  gchar *path;
+
+  g_return_if_fail (GTK_IS_PLACES_VIEW (view));
+  g_return_if_fail (G_IS_VOLUME (volume));
+
+  priv = view->priv;
+
+  mount = g_volume_get_mount (volume);
+  root = mount ? g_mount_get_root (mount) : NULL;
+  icon = g_volume_get_icon (volume);
+  name = g_volume_get_name (volume);
+  path = root ? g_file_get_path (root) : NULL;
+
+  row = g_object_new (PLACES_TYPE_ROW,
+                      "icon", icon,
+                      "name", name,
+                      "path", path ? path : "",
+                      NULL);
+
+  gtk_list_box_insert (GTK_LIST_BOX (priv->drives_listbox), row, -1);
+
+  g_clear_object (&root);
+  g_clear_object (&icon);
+  g_clear_object (&mount);
+  g_free (name);
+  g_free (path);
+}
+
+static void
+add_drive (GtkPlacesView *view,
+           GDrive        *drive)
+{
+  GList *volumes;
+  GList *l;
+
+  g_return_if_fail (GTK_IS_PLACES_VIEW (view));
+  g_return_if_fail (G_IS_DRIVE (drive));
+
+  volumes = g_drive_get_volumes (drive);
+
+  /* Removable devices won't appear here */
+  if (g_drive_is_media_removable (drive))
+    return;
+
+  for (l = volumes; l != NULL; l = l->next)
+    add_volume (view, l->data);
+
+  g_list_free_full (volumes, g_object_unref);
+}
+
+static void
 gtk_places_view_constructed (GObject *object)
 {
   GtkPlacesViewPrivate *priv = GTK_PLACES_VIEW (object)->priv;
-  GList *mounts;
+  GList *drives;
   GList *l;
 
   if (G_OBJECT_CLASS (gtk_places_view_parent_class)->constructed)
     G_OBJECT_CLASS (gtk_places_view_parent_class)->constructed (object);
 
-  mounts = g_volume_monitor_get_mounts (priv->volume_monitor);
+  /* Add currently connected drives */
+  drives = g_volume_monitor_get_connected_drives (priv->volume_monitor);
 
-  for (l = mounts; l != NULL; l = l->next)
-    {
-      GtkWidget *row;
-      GMount *mount;
-      GDrive *drive;
-      GFile *root;
-      GIcon *icon;
-      gchar *name;
-      gchar *path;
+  for (l = drives; l != NULL; l = l->next)
+    add_drive (GTK_PLACES_VIEW (object), l->data);
 
-      mount = l->data;
-      drive = g_mount_get_drive (mount);
+  g_list_free_full (drives, g_object_unref);
 
-      /* Removable devices won't appear here */
-      if (drive && g_drive_is_media_removable (drive))
-        {
-          g_object_unref (drive);
-          continue;
-        }
-
-      root = g_mount_get_root (mount);
-      icon = g_mount_get_icon (mount);
-      name = g_mount_get_name (mount);
-      path = g_file_get_path (root);
-
-      row = g_object_new (PLACES_TYPE_ROW,
-                          "icon", icon,
-                          "name", name,
-                          "path", path,
-                          NULL);
-
-      gtk_list_box_insert (GTK_LIST_BOX (priv->drives_listbox), row, -1);
-
-      g_clear_object (&root);
-      g_clear_object (&icon);
-      g_clear_object (&drive);
-      g_free (name);
-      g_free (path);
-    }
-
-  g_list_free_full (mounts, g_object_unref);
+  g_signal_connect_swapped (priv->volume_monitor,
+                            "drive-connected",
+                            G_CALLBACK (add_drive),
+                            object);
+  g_signal_connect_swapped (priv->volume_monitor,
+                            "volume-added",
+                            G_CALLBACK (add_volume),
+                            object);
 }
 
 static void
